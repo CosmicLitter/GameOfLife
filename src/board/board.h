@@ -27,10 +27,11 @@ private:
 
   void Init();
 
-  void Print();
 
 public:
-  Board(int width, int height);
+  Board();
+
+  void Resize();
 
   int GetWidth();
 
@@ -41,10 +42,11 @@ public:
   // Increment by a single generation
   void Step();
 
+  void Print();
+
 private:
   int width_;
   int height_;
-  bool is_running_;
   std::vector<Cell> board_;
 };
 

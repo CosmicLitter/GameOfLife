@@ -1,0 +1,2 @@
+# Terminal Based Conway's Game of Life in CPP
+I've always wanted to get into cellular automata, so it seems appropriate to start with a classic. This particular implementation was a lot simpler than I though it would be. Though, I may have engaged with pre-emptive abstractions. I plan to have another try at this project, but to implement it with SDL instead, avoiding some of the unnecessary class based design.

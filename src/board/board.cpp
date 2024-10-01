@@ -1,5 +1,8 @@
 #include "board.h"
+#include <sstream>
+#include <sys/ioctl.h>
 #include <iostream>
+#include <unistd.h>
 
 Cell& Board::Get(int x, int y) { return board_[y * width_ + (x)]; }
 
@@ -57,18 +60,24 @@ void Board::UpdateState() {
 
 // "Pretty print" the board
 void Board::Print() {
+  std::wstringstream output;
+  output << L"\033[3J\033[2J\033[H";
+
   for (int i = 0; i < width_ * height_; ++i) {
     auto &cell = board_[i];
-    std::wcout << cell.first << cell.second;
+    output << cell.first << cell.second;
     if ((i + 1) % width_ == 0) {
-      std::wcout << L'\n';
+      output << L"\033[1E";
     }
   }
+  std::wcout << output.str() << std::flush;
 }
 
-Board::Board(int width, int height)
-      : width_(width), height_(height), is_running_(false),
-        board_(std::vector<Cell>(width_ * height_)) {}
+Board::Board()
+      : width_(0), height_(0),
+        board_(std::vector<Cell>(width_ * height_)) {
+  Init();
+}
 
 int Board::GetWidth() { return width_; }
 
@@ -86,17 +95,23 @@ void Board::Init() {
   }
   Print();
 }
+
+void Board::Resize() {
+  winsize ws;
+  if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1) {
+    throw std::runtime_error("Failed to get terminal size.");
+  }
+  width_ = ws.ws_col / 2;
+  height_ = ws.ws_row;
+  board_.resize(width_ * height_);
+  Init();
+}
+
 // Currently runs in an infinite loop
 void Board::Run() {
-  Init();
-  is_running_ = true;
-  while (is_running_ == true) {
-    UpdateState();
-    Print();
-    std::wcout << std::endl;
-  }
+  UpdateState();
 }
+
 void Board::Step() {
   UpdateState();
-  Print();
 }
